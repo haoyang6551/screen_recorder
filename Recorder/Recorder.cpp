@@ -72,6 +72,8 @@ int main()
 			SWS_BICUBIC, 
 			NULL,NULL, NULL);
 
+		FILE* fp_yuv = fopen("output.yuv", "wb+");
+
 		for (;;) {
 			if (av_read_frame(pFormatCtx, packet) < 0) {
 				break;
@@ -85,6 +87,10 @@ int main()
 
 				if (gotPic) {
 					sws_scale(imgConvertCtx, (const uint8_t* const*)pFrameRGB->data, pFrameRGB->linesize, 0, pCodecCtx->height, pFrameYUV->data, pFrameYUV->linesize);
+					int y_size = pCodecCtx->width * pCodecCtx->height;
+					fwrite(pFrameYUV->data[0], 1, y_size, fp_yuv);    //Y   
+					fwrite(pFrameYUV->data[1], 1, y_size / 4, fp_yuv);  //U  
+					fwrite(pFrameYUV->data[2], 1, y_size / 4, fp_yuv);  //V 
 				}
 
 				_sleep(50);
@@ -96,6 +102,7 @@ int main()
 		av_free(pFrameYUV);
 		avcodec_close(pCodecCtx);
 		avformat_close_input(&pFormatCtx);
+		fclose(fp_yuv);
 	}
 	catch (std::exception ex) {
 		printf("%s\r\n", ex.what());
