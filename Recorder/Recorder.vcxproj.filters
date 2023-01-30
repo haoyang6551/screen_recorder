@@ -13,24 +13,48 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\record">
+      <UniqueIdentifier>{7ade1b27-b458-4554-a3dc-fb8003626448}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\record">
+      <UniqueIdentifier>{32effb24-7c4f-47e1-833e-412c9135ffae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common">
+      <UniqueIdentifier>{4def5ebd-862e-45c8-9a80-11ff6131150e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="desktop_common_define.h">
+      <Filter>Header Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="headers_ffmpeg.h">
+      <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="record_desktop.h">
+      <Filter>Header Files\record</Filter>
+    </ClInclude>
+    <ClInclude Include="record_desktop_factory.h">
+      <Filter>Header Files\record</Filter>
+    </ClInclude>
+    <ClInclude Include="record_desktop_ffmpeg_gdi.h">
+      <Filter>Header Files\record</Filter>
+    </ClInclude>
+    <ClInclude Include="error_define.h">
+      <Filter>Header Files\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Recorder.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="record_desktop.cpp">
+      <Filter>Source Files\record</Filter>
+    </ClCompile>
+    <ClCompile Include="record_desktop_factory.cpp">
+      <Filter>Source Files\record</Filter>
+    </ClCompile>
+    <ClCompile Include="record_desktop_ffmpeg_gdi.cpp">
+      <Filter>Source Files\record</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
