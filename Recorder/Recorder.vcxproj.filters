@@ -22,6 +22,12 @@
     <Filter Include="Header Files\common">
       <UniqueIdentifier>{4def5ebd-862e-45c8-9a80-11ff6131150e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\encode">
+      <UniqueIdentifier>{2397926d-4051-4de3-8076-c8a69ef2db02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\encode">
+      <UniqueIdentifier>{295a50c9-e24b-42d1-8dbf-46ed487202d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="desktop_common_define.h">
@@ -42,6 +48,12 @@
     <ClInclude Include="error_define.h">
       <Filter>Header Files\common</Filter>
     </ClInclude>
+    <ClInclude Include="encode_264.h">
+      <Filter>Header Files\encode</Filter>
+    </ClInclude>
+    <ClInclude Include="ring_buffer.h">
+      <Filter>Header Files\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Recorder.cpp">
@@ -55,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="record_desktop_ffmpeg_gdi.cpp">
       <Filter>Source Files\record</Filter>
+    </ClCompile>
+    <ClCompile Include="encode_264.cpp">
+      <Filter>Source Files\encode</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

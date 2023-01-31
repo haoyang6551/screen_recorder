@@ -10,8 +10,8 @@
 #include <functional>
 
 namespace am {
-	typedef std::function<void(AVFrame* frame)> DesktopData;
-	typedef std::function<void(int)> DesktopError;
+	typedef std::function<void(AVFrame* frame)> DesktopDataFunc;
+	typedef std::function<void(int)> DesktopErrorFunc;
 
 	class RecordDesktop
 	{
@@ -40,8 +40,8 @@ namespace am {
 		inline const std::string& get_device_name() { return device_name_; }
 		inline const RecordDesktopDataTypes get_data_type() { return data_type_; }
 		inline void registe_cb(
-			DesktopData on_data,
-			DesktopError on_error) {
+			DesktopDataFunc on_data,
+			DesktopErrorFunc on_error) {
 			on_data_ = on_data;
 			on_error_ = on_error;
 		}
@@ -66,8 +66,8 @@ namespace am {
 
 		int fps_;
 
-		DesktopData on_data_;
-		DesktopError on_error_;
+		DesktopDataFunc on_data_;
+		DesktopErrorFunc on_error_;
 
 		AVRational time_base_;
 		int64_t start_time_;

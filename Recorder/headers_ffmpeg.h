@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <Windows.h>
 extern "C" {
 #include <libavformat\avformat.h>
 #include <libavcodec\avcodec.h>

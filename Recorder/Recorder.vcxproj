@@ -145,14 +145,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="encode_264.h" />
     <ClInclude Include="error_define.h" />
     <ClInclude Include="headers_ffmpeg.h" />
     <ClInclude Include="record_desktop.h" />
     <ClInclude Include="desktop_common_define.h" />
     <ClInclude Include="record_desktop_factory.h" />
     <ClInclude Include="record_desktop_ffmpeg_gdi.h" />
+    <ClInclude Include="ring_buffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="encode_264.cpp" />
     <ClCompile Include="Recorder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
