@@ -9,7 +9,7 @@ int record_desktop_new(RecordDesktopTypes type, am::RecordDesktop** recorder)
 	switch (type)
 	{
 	case DT_DESKTOP_FFMPEG_GDI:
-		// *recorder = (am::record_desktop*)new am::record_desktop_ffmpeg_gdi();
+		*recorder = (am::RecordDesktop*)new am::RecordDesktopFfmpegGdi();
 		break;
 	default:
 		err = AE_UNSUPPORT;

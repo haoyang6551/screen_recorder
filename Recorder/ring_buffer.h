@@ -40,10 +40,8 @@ namespace am {
 
 			if (head_ + len <= size_) {
 				memcpy(buf_ + head_, data, len);
-
 				head_ += len;
-			}
-			else if (head_ + len > size_) {
+			} else if (head_ + len > size_) {
 				int remain = len - (size_ - head_);
 				if (len - remain > 0)
 					memcpy(buf_ + head_, data, len - remain);
@@ -77,7 +75,7 @@ namespace am {
 			frames_.pop();
 
 			if (frame.len > len) {
-				std::cout << "ringbuff::get need larger buffer" << std::endl;
+				std::cout << "RingBuff::get need larger buffer" << std::endl;
 				return 0;
 			}
 

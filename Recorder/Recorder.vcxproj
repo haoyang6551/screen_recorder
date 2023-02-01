@@ -148,20 +148,27 @@
     <ClInclude Include="encode_264.h" />
     <ClInclude Include="error_define.h" />
     <ClInclude Include="headers_ffmpeg.h" />
+    <ClInclude Include="record_audio_factory.h" />
+    <ClInclude Include="record_audio_dshow.h" />
     <ClInclude Include="record_desktop.h" />
     <ClInclude Include="desktop_common_define.h" />
     <ClInclude Include="record_desktop_factory.h" />
     <ClInclude Include="record_desktop_ffmpeg_gdi.h" />
     <ClInclude Include="ring_buffer.h" />
+    <ClInclude Include="audio_common_define.h" />
+    <ClInclude Include="record_audio.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="encode_264.cpp" />
     <ClCompile Include="Recorder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="record_audio_factory.cpp" />
+    <ClCompile Include="record_audio_dshow.cpp" />
     <ClCompile Include="record_desktop.cpp" />
     <ClCompile Include="record_desktop_factory.cpp" />
     <ClCompile Include="record_desktop_ffmpeg_gdi.cpp" />
+    <ClCompile Include="record_audio.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

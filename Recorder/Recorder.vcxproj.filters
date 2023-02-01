@@ -54,6 +54,18 @@
     <ClInclude Include="ring_buffer.h">
       <Filter>Header Files\common</Filter>
     </ClInclude>
+    <ClInclude Include="audio_common_define.h">
+      <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="record_audio.h">
+      <Filter>Header Files\record</Filter>
+    </ClInclude>
+    <ClInclude Include="record_audio_factory.h">
+      <Filter>Header Files\record</Filter>
+    </ClInclude>
+    <ClInclude Include="record_audio_dshow.h">
+      <Filter>Header Files\record</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Recorder.cpp">
@@ -70,6 +82,15 @@
     </ClCompile>
     <ClCompile Include="encode_264.cpp">
       <Filter>Source Files\encode</Filter>
+    </ClCompile>
+    <ClCompile Include="record_audio.cpp">
+      <Filter>Source Files\record</Filter>
+    </ClCompile>
+    <ClCompile Include="record_audio_factory.cpp">
+      <Filter>Source Files\record</Filter>
+    </ClCompile>
+    <ClCompile Include="record_audio_dshow.cpp">
+      <Filter>Source Files\record</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
