@@ -7,7 +7,7 @@
 
 int main()
 {
-	auto RecordVideo = new am::RecordDesktopFfmpegGdi();
+	auto RecordVideo = new am::RecordDesktopFFmpegGdi();
 	RecordDesktopRect rect = {10, 10, 30, 30};
 	RecordVideo->Init(rect, 24);
 	RecordVideo->Start();

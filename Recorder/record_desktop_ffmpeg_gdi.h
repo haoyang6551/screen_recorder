@@ -5,11 +5,11 @@
 
 namespace am {
 
-	class RecordDesktopFfmpegGdi :public RecordDesktop
+	class RecordDesktopFFmpegGdi :public RecordDesktop
 	{
 	public:
-		RecordDesktopFfmpegGdi();
-		~RecordDesktopFfmpegGdi();
+		RecordDesktopFFmpegGdi();
+		~RecordDesktopFFmpegGdi();
 
 		virtual int Init(
 			const RecordDesktopRect& rect,

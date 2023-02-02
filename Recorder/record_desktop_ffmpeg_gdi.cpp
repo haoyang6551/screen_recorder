@@ -5,7 +5,7 @@
 
 namespace am {
 
-	RecordDesktopFfmpegGdi::RecordDesktopFfmpegGdi()
+	RecordDesktopFFmpegGdi::RecordDesktopFFmpegGdi()
 	{
 		av_register_all();
 		avdevice_register_all();
@@ -20,13 +20,13 @@ namespace am {
 	}
 
 
-	RecordDesktopFfmpegGdi::~RecordDesktopFfmpegGdi()
+	RecordDesktopFFmpegGdi::~RecordDesktopFFmpegGdi()
 	{
 		Stop();
 		CleanUp();
 	}
 
-	int RecordDesktopFfmpegGdi::Init(const RecordDesktopRect& rect, const int fps)
+	int RecordDesktopFFmpegGdi::Init(const RecordDesktopRect& rect, const int fps)
 	{
 		int error = AE_NO;
 		if (inited_ == true) {
@@ -108,7 +108,7 @@ namespace am {
 		return error;
 	}
 
-	int RecordDesktopFfmpegGdi::Start()
+	int RecordDesktopFFmpegGdi::Start()
 	{
 		if (running_ == true) {
 			std::cout << "record desktop gdi is already running" << std::endl;
@@ -120,24 +120,24 @@ namespace am {
 		}
 
 		running_ = true;
-		thread_ = std::thread(std::bind(&RecordDesktopFfmpegGdi::RecordFunc, this));
+		thread_ = std::thread(std::bind(&RecordDesktopFFmpegGdi::RecordFunc, this));
 
 		return AE_NO;
 	}
 
-	int RecordDesktopFfmpegGdi::Pause()
+	int RecordDesktopFFmpegGdi::Pause()
 	{
 		paused_ = true;
 		return AE_NO;
 	}
 
-	int RecordDesktopFfmpegGdi::Resume()
+	int RecordDesktopFFmpegGdi::Resume()
 	{
 		paused_ = false;
 		return AE_NO;
 	}
 
-	int RecordDesktopFfmpegGdi::Stop()
+	int RecordDesktopFFmpegGdi::Stop()
 	{
 		running_ = false;
 		if (thread_.joinable())
@@ -146,7 +146,7 @@ namespace am {
 		return AE_NO;
 	}
 
-	void RecordDesktopFfmpegGdi::CleanUp()
+	void RecordDesktopFFmpegGdi::CleanUp()
 	{
 		if (codec_ctx_)
 			avcodec_close(codec_ctx_);
@@ -163,7 +163,7 @@ namespace am {
 		inited_ = false;
 	}
 
-	int RecordDesktopFfmpegGdi::Decode(AVFrame* frame, AVPacket* packet)
+	int RecordDesktopFFmpegGdi::Decode(AVFrame* frame, AVPacket* packet)
 	{
 		int ret = avcodec_send_packet(codec_ctx_, packet);
 		if (ret < 0) {
@@ -197,7 +197,7 @@ namespace am {
 		return AE_NO;
 	}
 
-	void RecordDesktopFfmpegGdi::RecordFunc()
+	void RecordDesktopFFmpegGdi::RecordFunc()
 	{
 		AVPacket* packet = av_packet_alloc();
 		AVFrame* frame = av_frame_alloc();
