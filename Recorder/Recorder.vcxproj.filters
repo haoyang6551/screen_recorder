@@ -28,6 +28,12 @@
     <Filter Include="Source Files\encode">
       <UniqueIdentifier>{295a50c9-e24b-42d1-8dbf-46ed487202d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\filter">
+      <UniqueIdentifier>{140edb8d-2e67-4ce3-b960-7a42b5a58c28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\filter">
+      <UniqueIdentifier>{10748ba5-7892-4856-96de-31f18f0e3fe5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="desktop_common_define.h">
@@ -69,6 +75,9 @@
     <ClInclude Include="encode_aac.h">
       <Filter>Header Files\encode</Filter>
     </ClInclude>
+    <ClInclude Include="filter_audio.h">
+      <Filter>Header Files\filter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Recorder.cpp">
@@ -97,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="encode_aac.cpp">
       <Filter>Source Files\encode</Filter>
+    </ClCompile>
+    <ClCompile Include="filter_audio.cpp">
+      <Filter>Source Files\filter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
