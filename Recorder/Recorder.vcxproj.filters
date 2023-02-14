@@ -34,6 +34,12 @@
     <Filter Include="Source Files\filter">
       <UniqueIdentifier>{10748ba5-7892-4856-96de-31f18f0e3fe5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\mux">
+      <UniqueIdentifier>{233d1ec4-c88e-47cd-93a4-4b8c4d47f79f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mux">
+      <UniqueIdentifier>{6641c165-579a-4dca-a8b8-e602ffeae9bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="desktop_common_define.h">
@@ -78,6 +84,15 @@
     <ClInclude Include="filter_audio.h">
       <Filter>Header Files\filter</Filter>
     </ClInclude>
+    <ClInclude Include="mux_define.h">
+      <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="mux_file.h">
+      <Filter>Header Files\mux</Filter>
+    </ClInclude>
+    <ClInclude Include="mux_mp4.h">
+      <Filter>Header Files\mux</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Recorder.cpp">
@@ -109,6 +124,12 @@
     </ClCompile>
     <ClCompile Include="filter_audio.cpp">
       <Filter>Source Files\filter</Filter>
+    </ClCompile>
+    <ClCompile Include="mux_file.cpp">
+      <Filter>Source Files\mux</Filter>
+    </ClCompile>
+    <ClCompile Include="mux_mp4.cpp">
+      <Filter>Source Files\mux</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

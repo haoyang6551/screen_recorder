@@ -153,6 +153,9 @@
     <ClInclude Include="error_define.h" />
     <ClInclude Include="filter_audio.h" />
     <ClInclude Include="headers_ffmpeg.h" />
+    <ClInclude Include="mux_define.h" />
+    <ClInclude Include="mux_file.h" />
+    <ClInclude Include="mux_mp4.h" />
     <ClInclude Include="record_audio_factory.h" />
     <ClInclude Include="record_audio_dshow.h" />
     <ClInclude Include="record_desktop.h" />
@@ -167,6 +170,8 @@
     <ClCompile Include="encode_264.cpp" />
     <ClCompile Include="encode_aac.cpp" />
     <ClCompile Include="filter_audio.cpp" />
+    <ClCompile Include="mux_file.cpp" />
+    <ClCompile Include="mux_mp4.cpp" />
     <ClCompile Include="Recorder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
