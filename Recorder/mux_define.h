@@ -10,13 +10,13 @@ namespace am {
 		int sample_in_;
 	};
 
-	class encoder_264;
-	class record_desktop;
+	class Encoder264;
+	class RecordDesktop;
 	class sws_helper;
 
-	class encoder_aac;
-	class filter_audio;
-	class record_audio;
+	class EncoderAAC;
+	class FilterAudio;
+	class RecordAudio;
 	class resample_pcm;
 
 	struct MuxSetting {
@@ -42,19 +42,19 @@ namespace am {
 		MuxSetting setting_;        // output setting
 
 		//video
-		encoder_264* v_enc_;         // video encoder
-		record_desktop* v_src_;      // video source
+		Encoder264* v_enc_;         // video encoder
+		RecordDesktop* v_src_;      // video source
 		sws_helper* v_sws_;          // video sws
 
 		//audio
-		encoder_aac* a_enc_;          // audio encoder
-		filter_audio* a_filter_;      // audio mixer
+		EncoderAAC* a_enc_;          // audio encoder
+		FilterAudio* a_filter_;      // audio mixer
 		int a_nb_;                    // audio source num
-		record_audio** a_src_;        // audio sources
+		RecordAudio** a_src_;        // audio sources
 		resample_pcm** a_rs_;         // audio resamplers
 		AudioSample** a_samples_;     // audio sample data
 		AudioSample** a_resamples_;   // audio resampled data
-	}MUX_STREAM;
+	};
 }
 
 #endif

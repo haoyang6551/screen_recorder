@@ -73,7 +73,7 @@ namespace am {
 
 			encoder_ctx_->qmin = 20;
 			encoder_ctx_->qmax = 40;
-			int qb_float = (encoder_ctx_->qmax - encoder_ctx_->qmin) * (100 - qb) / 100;   // ´Ë²¿·Ö´æÒÉ
+			int qb_float = (encoder_ctx_->qmax - encoder_ctx_->qmin) * qb / 100;
 			encoder_ctx_->qmin = encoder_ctx_->qmin + qb_float;
 			encoder_ctx_->qmax = encoder_ctx_->qmax - qb_float;
 			encoder_ctx_->max_b_frames = 0;//NO B Frame

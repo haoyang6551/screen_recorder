@@ -5,8 +5,8 @@
 
 namespace am {
 
-	class record_audio;
-	class record_desktop;
+	class RecordAudio;
+	class RecordDesktop;
 
 	struct MuxStream;
 	struct MuxSetting;
@@ -21,8 +21,8 @@ namespace am {
 
 		virtual int Init(
 			const char* output_file,
-			record_desktop* source_desktop,
-			record_audio** source_audios,
+			RecordDesktop* source_desktop,
+			RecordAudio** source_audios,
 			const int source_audios_nb,
 			const MuxSetting& setting
 		) = 0;

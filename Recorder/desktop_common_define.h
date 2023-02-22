@@ -28,12 +28,12 @@ typedef enum {
 *
 */
 
-typedef struct {
+struct RecordDesktopRect {
 	int left_;
 	int top_;
 	int right_;
 	int bottom_;
-}RecordDesktopRect;
+};
 
 
 

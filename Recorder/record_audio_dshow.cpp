@@ -179,7 +179,7 @@ namespace am {
 			if (ret == 0 && on_data_)
 				on_data_(frame, extra_index_);
 
-			av_frame_unref(frame);//need to do this? avcodec_receive_frame said will call unref before receive
+			av_frame_unref(frame);
 		}
 
 		return AE_NO;

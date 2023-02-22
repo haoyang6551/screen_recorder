@@ -93,7 +93,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)ffmpeg\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>avformat.lib;avutil.lib;avdevice.lib;avcodec.lib;swscale.lib;avfilter.lib</AdditionalDependencies>
+      <AdditionalDependencies>avformat.lib;avutil.lib;avdevice.lib;avcodec.lib;swscale.lib;swresample.lib;avfilter.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /r /y $(SolutionDir)ffmpeg\bin $(TargetDir)</Command>
@@ -162,9 +162,11 @@
     <ClInclude Include="desktop_common_define.h" />
     <ClInclude Include="record_desktop_factory.h" />
     <ClInclude Include="record_desktop_ffmpeg_gdi.h" />
+    <ClInclude Include="resample_pcm.h" />
     <ClInclude Include="ring_buffer.h" />
     <ClInclude Include="audio_common_define.h" />
     <ClInclude Include="record_audio.h" />
+    <ClInclude Include="sws_helper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="encode_264.cpp" />
@@ -181,6 +183,8 @@
     <ClCompile Include="record_desktop_factory.cpp" />
     <ClCompile Include="record_desktop_ffmpeg_gdi.cpp" />
     <ClCompile Include="record_audio.cpp" />
+    <ClCompile Include="resample_pcm.cpp" />
+    <ClCompile Include="sws_helper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

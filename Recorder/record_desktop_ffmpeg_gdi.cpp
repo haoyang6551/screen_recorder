@@ -37,7 +37,9 @@ namespace am {
 		rect_ = rect;
 
 		char buff_video_size[50] = { 0 };
-		std::cout << buff_video_size << 50 << " width " << rect.right_ - rect.left_ << " height " << rect.bottom_ - rect.top_ << std::endl;
+		
+		sprintf_s(buff_video_size, 50, "%dx%d", rect.right_ - rect.left_, rect.bottom_ - rect.top_);
+		
 
 		AVDictionary* options = NULL;
 		av_dict_set_int(&options, "framerate", fps, AV_DICT_MATCH_CASE);

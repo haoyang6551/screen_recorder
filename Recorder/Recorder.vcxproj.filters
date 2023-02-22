@@ -40,6 +40,18 @@
     <Filter Include="Source Files\mux">
       <UniqueIdentifier>{6641c165-579a-4dca-a8b8-e602ffeae9bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\sws">
+      <UniqueIdentifier>{4139c26a-c5a5-406b-9869-ba28894a9262}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sws">
+      <UniqueIdentifier>{29042d40-20e3-4d84-93f7-ca8a4a187e0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\resample">
+      <UniqueIdentifier>{24fd91d8-c7b2-4f33-810f-11fae379799c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\resample">
+      <UniqueIdentifier>{5a993982-fd09-4bd3-816b-89b68525b3f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="desktop_common_define.h">
@@ -93,6 +105,12 @@
     <ClInclude Include="mux_mp4.h">
       <Filter>Header Files\mux</Filter>
     </ClInclude>
+    <ClInclude Include="sws_helper.h">
+      <Filter>Header Files\sws</Filter>
+    </ClInclude>
+    <ClInclude Include="resample_pcm.h">
+      <Filter>Header Files\resample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Recorder.cpp">
@@ -130,6 +148,12 @@
     </ClCompile>
     <ClCompile Include="mux_mp4.cpp">
       <Filter>Source Files\mux</Filter>
+    </ClCompile>
+    <ClCompile Include="sws_helper.cpp">
+      <Filter>Source Files\sws</Filter>
+    </ClCompile>
+    <ClCompile Include="resample_pcm.cpp">
+      <Filter>Source Files\resample</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

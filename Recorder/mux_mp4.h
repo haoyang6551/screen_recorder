@@ -22,8 +22,8 @@ namespace am {
 
 		int Init(
 			const char* output_file,
-			record_desktop* source_desktop,
-			record_audio** source_audios,
+			RecordDesktop* source_desktop,
+			RecordAudio** source_audios,
 			const int source_audios_nb,
 			const MuxSetting& setting
 		);
@@ -61,14 +61,14 @@ namespace am {
 
 		int alloc_oc(const char* output_file, const MuxSetting& setting);
 
-		int add_video_stream(const MuxSetting& setting, record_desktop* source_desktop);
+		int add_video_stream(const MuxSetting& setting, RecordDesktop* source_desktop);
 
-		int add_audio_stream(const MuxSetting& setting, record_audio** source_audios, const int source_audios_nb);
+		int add_audio_stream(const MuxSetting& setting, RecordAudio** source_audios, const int source_audios_nb);
 
 		int open_output(const char* output_file, const MuxSetting& setting);
 
 		void CleanUpVideo();
-		void CleanAudio();
+		void CleanUpAudio();
 		void CleanUp();
 
 		uint64_t get_current_time();
@@ -86,7 +86,8 @@ namespace am {
 
 		std::string output_file_;
 
-		struct MuxStream* v_stream_, * a_stream_;
+		MuxStream* v_stream_;
+		MuxStream* a_stream_;
 
 		AVOutputFormat* fmt_;
 		AVFormatContext* fmt_ctx_;
