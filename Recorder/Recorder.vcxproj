@@ -162,11 +162,11 @@
     <ClInclude Include="desktop_common_define.h" />
     <ClInclude Include="record_desktop_factory.h" />
     <ClInclude Include="record_desktop_ffmpeg_gdi.h" />
-    <ClInclude Include="resample_pcm.h" />
+    <ClInclude Include="resample_audio.h" />
     <ClInclude Include="ring_buffer.h" />
     <ClInclude Include="audio_common_define.h" />
     <ClInclude Include="record_audio.h" />
-    <ClInclude Include="sws_helper.h" />
+    <ClInclude Include="sws_video.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="encode_264.cpp" />
@@ -183,8 +183,8 @@
     <ClCompile Include="record_desktop_factory.cpp" />
     <ClCompile Include="record_desktop_ffmpeg_gdi.cpp" />
     <ClCompile Include="record_audio.cpp" />
-    <ClCompile Include="resample_pcm.cpp" />
-    <ClCompile Include="sws_helper.cpp" />
+    <ClCompile Include="resample_audio.cpp" />
+    <ClCompile Include="sws_video.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

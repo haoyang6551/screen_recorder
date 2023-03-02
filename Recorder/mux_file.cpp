@@ -4,7 +4,6 @@ namespace am {
 
 	MuxFile::MuxFile()
 	{
-		on_yuv_data_ = nullptr;
 	}
 
 

@@ -3,11 +3,11 @@
 
 #include "record_desktop.h"
 #include "encode_264.h"
-#include "sws_helper.h"
+#include "sws_video.h"
 
 #include "record_audio.h"
 #include "encode_aac.h"
-#include "resample_pcm.h"
+#include "resample_audio.h"
 #include "filter_audio.h"
 
 #include "ring_buffer.h"
@@ -197,12 +197,10 @@ namespace am {
 		int len = 0, ret = AE_NO;
 		uint8_t* yuv_data = NULL;
 
-		ret = v_stream_->v_sws_->convert(frame, &yuv_data, &len);
+		ret = v_stream_->v_sws_->Convert(frame, &yuv_data, &len);
 
 		if (ret == AE_NO && yuv_data && len) {
 			v_stream_->v_enc_->put(yuv_data, len, frame);
-
-			if (on_yuv_data_) on_yuv_data_(yuv_data, len, frame->width, frame->height, 0);
 		}
 	}
 
@@ -211,32 +209,6 @@ namespace am {
 		std::cout << "on desktop capture error:" << error << std::endl;
 	}
 
-	int getPcmDB(const unsigned char* pcmdata, size_t size) 
-	{
-		int db = 0;
-		float value = 0;
-		double sum = 0;
-		double average = 0;
-		int bit_per_sample = 32;
-		int byte_per_sample = bit_per_sample / 8;
-		int channel_num = 2;
-
-		for (int i = 0; i < size; i += channel_num * byte_per_sample)
-		{
-			memcpy(&value, pcmdata + i, byte_per_sample);
-			sum += abs(value);
-		}
-		average = sum / (double)(size / byte_per_sample / channel_num);
-		if (average > 0)
-		{
-			db = (int)(20 * log10f(average));
-		}
-
-		std::cout << "db " << db << "average " << average << "sum " << sum << std::endl;
-		return db;
-	}
-
-#if 1 //with filter
 	void MuxMP4::on_audio_data(AVFrame* frame, int index)
 	{
 		if (running_ == false
@@ -251,59 +223,8 @@ namespace am {
 
 		a_stream_->a_filter_->add_frame(frame, index);
 
-		/*
-		if (index == 1) {
-			getPcmDB(frame->data[0], frame->linesize[0]);
-		}
-		*/
-
 		return;
 	}
-#else
-	void MuxMP4::on_audio_data(AVFrame* frame, int index)
-	{
-		if (_running == false
-			|| !a_stream_
-			|| !a_stream_->a_samples
-			|| !a_stream_->a_samples[index]
-			|| !a_stream_->a_resamples
-			|| !a_stream_->a_resamples[index]
-			|| !a_stream_->a_rs
-			|| !a_stream_->a_rs[index])
-			return;
-
-		AUDIO_SAMPLE* samples = a_stream_->a_samples[index];
-		AUDIO_SAMPLE* resamples = a_stream_->a_resamples[index];
-		resample_pcm* resampler = a_stream_->a_rs[index];
-
-		int copied_len = 0;
-		int sample_len = av_samples_get_buffer_size(NULL, frame->channels, frame->nb_samples, (AVSampleFormat)frame->format, 1);
-		int remain_len = sample_len;
-
-		while (remain_len > 0) {//should add is_planner codes
-			//cache pcm
-			copied_len = min(samples->size - samples->sample_in, remain_len);
-			if (copied_len) {
-				memcpy(samples->buff + samples->sample_in, frame->data[0] + sample_len - remain_len, copied_len);
-				samples->sample_in += copied_len;
-				remain_len = remain_len - copied_len;
-			}
-
-			//got enough pcm to encoder,resample and mix
-			if (samples->sample_in == samples->size) {
-				int ret = resampler->convert(samples->buff, samples->size, resamples->buff, resamples->size);
-				if (ret > 0) {
-					a_stream_->a_enc->put(resamples->buff, resamples->size, frame);
-				}
-				else {
-					al_debug("resample audio %d failed,%d", index, ret);
-				}
-
-				samples->sample_in = 0;
-			}
-		}
-	}
-#endif
 
 	void MuxMP4::on_audio_error(int error, int index)
 	{
@@ -441,8 +362,8 @@ namespace am {
 				std::bind(&MuxMP4::on_enc_264_error, this, std::placeholders::_1)
 			);
 
-			v_stream_->v_sws_ = new sws_helper();
-			error = v_stream_->v_sws_->init(
+			v_stream_->v_sws_ = new SwsVideo();
+			error = v_stream_->v_sws_->Init(
 				v_stream_->v_src_->get_pixel_fmt(),
 				v_rect.right_ - v_rect.left_,
 				v_rect.bottom_ - v_rect.top_,
@@ -505,7 +426,7 @@ namespace am {
 		memset(a_stream_, 0, sizeof(MuxStream));
 
 		a_stream_->a_nb_ = source_audios_nb;
-		a_stream_->a_rs_ = new resample_pcm * [a_stream_->a_nb_];
+		a_stream_->a_rs_ = new ResampleAudio * [a_stream_->a_nb_];
 		a_stream_->a_resamples_ = new AudioSample * [a_stream_->a_nb_];
 		a_stream_->a_samples_ = new AudioSample * [a_stream_->a_nb_];
 		a_stream_->a_src_ = new RecordAudio * [a_stream_->a_nb_];
@@ -552,9 +473,9 @@ namespace am {
 					setting.a_sample_rate_
 				};
 
-				a_stream_->a_rs_[i] = new resample_pcm();
+				a_stream_->a_rs_[i] = new ResampleAudio();
 				a_stream_->a_resamples_[i] = new AudioSample({ NULL,0,0 });
-				a_stream_->a_rs_[i]->init(&src_setting, &dst_setting, &a_stream_->a_resamples_[i]->size_);
+				a_stream_->a_rs_[i]->Init(&src_setting, &dst_setting, &a_stream_->a_resamples_[i]->size_);
 				a_stream_->a_resamples_[i]->buff_ = new uint8_t[a_stream_->a_resamples_[i]->size_];
 
 				a_stream_->a_samples_[i] = new AudioSample({ NULL,0,0 });

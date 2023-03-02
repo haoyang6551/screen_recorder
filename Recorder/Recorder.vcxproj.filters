@@ -105,10 +105,10 @@
     <ClInclude Include="mux_mp4.h">
       <Filter>Header Files\mux</Filter>
     </ClInclude>
-    <ClInclude Include="sws_helper.h">
+    <ClInclude Include="sws_video.h">
       <Filter>Header Files\sws</Filter>
     </ClInclude>
-    <ClInclude Include="resample_pcm.h">
+    <ClInclude Include="resample_audio.h">
       <Filter>Header Files\resample</Filter>
     </ClInclude>
   </ItemGroup>
@@ -149,10 +149,10 @@
     <ClCompile Include="mux_mp4.cpp">
       <Filter>Source Files\mux</Filter>
     </ClCompile>
-    <ClCompile Include="sws_helper.cpp">
+    <ClCompile Include="sws_video.cpp">
       <Filter>Source Files\sws</Filter>
     </ClCompile>
-    <ClCompile Include="resample_pcm.cpp">
+    <ClCompile Include="resample_audio.cpp">
       <Filter>Source Files\resample</Filter>
     </ClCompile>
   </ItemGroup>

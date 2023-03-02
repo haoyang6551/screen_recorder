@@ -31,7 +31,8 @@ namespace am {
 
 		CleanUp();
 
-		delete ring_buffer_;
+		if (ring_buffer_)
+			delete ring_buffer_;
 	}
 
 	int Encoder264::Init(int pic_width, int pic_height, int frame_rate, int bit_rate, int qb, int gop_size)
@@ -144,7 +145,7 @@ namespace am {
 		}
 
 		running_ = true;
-		thread_ = std::thread(std::bind(&Encoder264::EncodeLoop, this));
+		thread_ = std::thread(&Encoder264::EncodeLoop, this);
 
 		return error;
 	}

@@ -252,7 +252,7 @@ namespace am {
 			while (running_ && cond_notify_) {
 				ret = av_buffersink_get_frame(ctx_out_.ctx, frame);
 				if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-					break;;
+					break;
 				}
 
 				if (ret < 0) {

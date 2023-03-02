@@ -12,12 +12,12 @@ namespace am {
 
 	class Encoder264;
 	class RecordDesktop;
-	class sws_helper;
+	class SwsVideo;
 
 	class EncoderAAC;
 	class FilterAudio;
 	class RecordAudio;
-	class resample_pcm;
+	class ResampleAudio;
 
 	struct MuxSetting {
 		int v_frame_rate_;
@@ -44,14 +44,14 @@ namespace am {
 		//video
 		Encoder264* v_enc_;         // video encoder
 		RecordDesktop* v_src_;      // video source
-		sws_helper* v_sws_;          // video sws
+		SwsVideo* v_sws_;          // video sws
 
 		//audio
 		EncoderAAC* a_enc_;          // audio encoder
 		FilterAudio* a_filter_;      // audio mixer
 		int a_nb_;                    // audio source num
 		RecordAudio** a_src_;        // audio sources
-		resample_pcm** a_rs_;         // audio resamplers
+		ResampleAudio** a_rs_;         // audio resamplers
 		AudioSample** a_samples_;     // audio sample data
 		AudioSample** a_resamples_;   // audio resampled data
 	};
