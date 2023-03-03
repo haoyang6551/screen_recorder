@@ -161,14 +161,11 @@ namespace am {
 
 	int MuxMP4::Pause()
 	{
-		paused_ = true;
-
 		return 0;
 	}
 
 	int MuxMP4::Resume()
 	{
-		paused_ = false;
 		return 0;
 	}
 
@@ -294,7 +291,7 @@ namespace am {
 
 		v_stream_->v_src_ = source_desktop;
 
-		v_stream_->pre_pts_ = -1;
+		// v_stream_->pre_pts_ = -1;
 
 		v_stream_->v_src_->registe_cb(
 			std::bind(&MuxMP4::on_desktop_data, this, std::placeholders::_1),
@@ -381,7 +378,8 @@ namespace am {
 		a_stream_->a_resamples_ = new AudioSample();
 		a_stream_->a_samples_ = new AudioSample();
 		a_stream_->a_src_ = source_audio;
-		a_stream_->pre_pts_ = -1;
+		
+		// a_stream_->pre_pts_ = -1;
 
 
 		do {
@@ -474,26 +472,35 @@ namespace am {
 		int ret = 0;
 
 		do {
-			if (!(fmt_->flags & AVFMT_NOFILE)) {
-				ret = avio_open(&fmt_ctx_->pb, output_file, AVIO_FLAG_WRITE);
-				if (ret < 0) {
-					error = AE_FFMPEG_OPEN_IO_FAILED;
-					break;
-				}
+			ret = avio_open(&fmt_ctx_->pb, output_file, AVIO_FLAG_WRITE);
+			if (ret < 0) {
+				error = AE_FFMPEG_OPEN_IO_FAILED;
+				break;
 			}
 
-			AVDictionary* opt = NULL;
-			av_dict_set_int(&opt, "video_track_timescale", v_stream_->setting_.v_frame_rate_, 0);
-
-			//ret = avformat_write_header(_fmt_ctx, &opt);//no need to set this
 			ret = avformat_write_header(fmt_ctx_, NULL);
-
-			av_dict_free(&opt);
 
 			if (ret < 0) {
 				error = AE_FFMPEG_WRITE_HEADER_FAILED;
 				break;
 			}
+			//if (!(fmt_->flags & AVFMT_NOFILE)) {
+			//	ret = avio_open(&fmt_ctx_->pb, output_file, AVIO_FLAG_WRITE);
+			//	if (ret < 0) {
+			//		error = AE_FFMPEG_OPEN_IO_FAILED;
+			//		break;
+			//	}
+			//}
+
+			//AVDictionary* opt = NULL;
+			//av_dict_set_int(&opt, "video_track_timescale", v_stream_->setting_.v_frame_rate_, 0);
+
+			////ret = avformat_write_header(_fmt_ctx, &opt);//no need to set this
+			//ret = avformat_write_header(fmt_ctx_, NULL);
+
+			//av_dict_free(&opt);
+
+			
 		} while (0);
 
 		return error;
@@ -536,16 +543,6 @@ namespace am {
 			delete a_stream_->a_resamples_;
 		}
 
-		if (a_stream_->a_rs_)
-			delete[] a_stream_->a_rs_;
-
-		if (a_stream_->a_samples_)
-			delete[] a_stream_->a_samples_;
-
-		if (a_stream_->a_resamples_)
-			delete[] a_stream_->a_resamples_;
-		
-
 		delete a_stream_;
 
 		a_stream_ = nullptr;
@@ -581,39 +578,19 @@ namespace am {
 		//must lock here,coz av_interleaved_write_frame will push packet into a queue,and is not thread safe
 		std::lock_guard<std::mutex> lock(mutex_);
 
-		if (paused_) return AE_NO;
-
-		//if (a_stream_->pre_pts == (uint64_t)-1)
-		//	return 0;
+		if (base_time_ < 0)
+			return 0;
 
 		packet->stream_index = v_stream_->st_->index;
+		int64_t cur_time = get_current_time();
 
-		if (v_stream_->pre_pts_ == (uint64_t)-1) {
-			v_stream_->pre_pts_ = packet->pts;
-		}
+		packet->pts = cur_time - base_time_;
 
-		packet->pts = packet->pts - v_stream_->pre_pts_;
-		//packet->pts = av_rescale_q_rnd(packet->pts, {1,AV_TIME_BASE}, v_stream_->st->time_base, (AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-		packet->pts = av_rescale_q_rnd(packet->pts, v_stream_->v_src_->get_time_base(), v_stream_->st_->time_base, (AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-
+		packet->pts = av_rescale_q_rnd(packet->pts, {1,AV_TIME_BASE}, v_stream_->st_->time_base, (AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+		
 
 		packet->dts = packet->pts;//make sure that dts is equal to pts
 
-
-		//al_debug("V:%lld", packet->pts);
-
-#if 0
-		static FILE* fp = NULL;
-		if (fp == NULL) {
-			fp = fopen("..\\..\\save.264", "wb+");
-			//write sps pps
-			fwrite(v_stream_->v_enc->get_extradata(), 1, v_stream_->v_enc->get_extradata_size(), fp);
-		}
-
-		fwrite(packet->data, 1, packet->size, fp);
-
-		fflush(fp);
-#endif
 
 		av_assert0(packet->data != NULL);
 
@@ -624,25 +601,23 @@ namespace am {
 	int MuxMP4::write_audio(AVPacket* packet)
 	{
 		std::lock_guard<std::mutex> lock(mutex_);
-		if (paused_) return AE_NO;
-
 
 		packet->stream_index = a_stream_->st_->index;
 
-		if (a_stream_->pre_pts_ == (uint64_t)-1) {
-			a_stream_->pre_pts_ = packet->pts;
-		}
+		int64_t cur_time = get_current_time();
+		if (base_time_ < 0)
+			base_time_ = cur_time;
 
-		packet->pts = packet->pts - a_stream_->pre_pts_;
+		packet->pts = cur_time - base_time_;
 		packet->pts = av_rescale_q_rnd(packet->pts, { 1,AV_TIME_BASE }, a_stream_->st_->time_base, (AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
 
 		packet->dts = packet->pts;//make sure that dts is equal to pts
-		//al_debug("A:%lld %lld", packet->pts, packet->dts);
+		
 
 		av_assert0(packet->data != NULL);
 
 		int ret = av_interleaved_write_frame(fmt_ctx_, packet);//no need to unref packet,this will be auto unref
-
+		
 		return ret;
 	}
 }

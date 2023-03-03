@@ -151,7 +151,6 @@
     <ClInclude Include="encode_264.h" />
     <ClInclude Include="encode_aac.h" />
     <ClInclude Include="error_define.h" />
-    <ClInclude Include="filter_audio1.h" />
     <ClInclude Include="headers_ffmpeg.h" />
     <ClInclude Include="mux_define.h" />
     <ClInclude Include="mux_file.h" />
@@ -171,7 +170,6 @@
   <ItemGroup>
     <ClCompile Include="encode_264.cpp" />
     <ClCompile Include="encode_aac.cpp" />
-    <ClCompile Include="filter_audio1.cpp" />
     <ClCompile Include="mux_file.cpp" />
     <ClCompile Include="mux_mp4.cpp" />
     <ClCompile Include="Recorder.cpp">

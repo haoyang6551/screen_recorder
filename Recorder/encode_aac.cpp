@@ -207,7 +207,7 @@ namespace am {
 		{
 			std::unique_lock<std::mutex> lock(mutex_);
 			while (!cond_notify_ && running_)
-				cond_var_.wait_for(lock, std::chrono::milliseconds(300));
+				cond_var_.wait(lock);
 
 			while ((len = ring_buffer_->get(buff_, buff_size_, pcm_frame))) {
 

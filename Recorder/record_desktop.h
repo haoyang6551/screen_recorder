@@ -29,9 +29,9 @@ namespace am {
 		virtual int Resume() = 0;
 		virtual int Stop() = 0;
 
-		inline const AVRational& get_time_base() { return time_base_; }
+		/*inline const AVRational& get_time_base() { return time_base_; }
 
-		inline int64_t get_start_time() { return start_time_; }
+		inline int64_t get_start_time() { return start_time_; }*/
 
 		inline AVPixelFormat get_pixel_fmt() { return pixel_fmt_; }
 
@@ -69,8 +69,8 @@ namespace am {
 		DesktopDataFunc on_data_;
 		DesktopErrorFunc on_error_;
 
-		AVRational time_base_;
-		int64_t start_time_;
+		/*AVRational time_base_;
+		int64_t start_time_;*/
 		AVPixelFormat pixel_fmt_;
 	};
 }

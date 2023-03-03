@@ -28,12 +28,6 @@
     <Filter Include="Source Files\encode">
       <UniqueIdentifier>{295a50c9-e24b-42d1-8dbf-46ed487202d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\filter">
-      <UniqueIdentifier>{140edb8d-2e67-4ce3-b960-7a42b5a58c28}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\filter">
-      <UniqueIdentifier>{10748ba5-7892-4856-96de-31f18f0e3fe5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\mux">
       <UniqueIdentifier>{233d1ec4-c88e-47cd-93a4-4b8c4d47f79f}</UniqueIdentifier>
     </Filter>
@@ -93,9 +87,6 @@
     <ClInclude Include="encode_aac.h">
       <Filter>Header Files\encode</Filter>
     </ClInclude>
-    <ClInclude Include="filter_audio1.h">
-      <Filter>Header Files\filter</Filter>
-    </ClInclude>
     <ClInclude Include="mux_define.h">
       <Filter>Header Files\common</Filter>
     </ClInclude>
@@ -139,9 +130,6 @@
     </ClCompile>
     <ClCompile Include="encode_aac.cpp">
       <Filter>Source Files\encode</Filter>
-    </ClCompile>
-    <ClCompile Include="filter_audio1.cpp">
-      <Filter>Source Files\filter</Filter>
     </ClCompile>
     <ClCompile Include="mux_file.cpp">
       <Filter>Source Files\mux</Filter>

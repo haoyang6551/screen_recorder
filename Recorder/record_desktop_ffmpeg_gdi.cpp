@@ -93,8 +93,8 @@ namespace am {
 				break;
 			}
 
-			start_time_ = fmt_ctx_->streams[stream_index_]->start_time;
-			time_base_ = fmt_ctx_->streams[stream_index_]->time_base;
+			// start_time_ = fmt_ctx_->streams[stream_index_]->start_time;
+			// time_base_ = fmt_ctx_->streams[stream_index_]->time_base;
 			pixel_fmt_ = fmt_ctx_->streams[stream_index_]->codec->pix_fmt;
 
 			inited_ = true;
@@ -187,9 +187,9 @@ namespace am {
 
 			if (ret == 0 && on_data_) {
 				//use relative time instead of device time
-				frame->pts = av_gettime_relative();// -_start_time;
-				frame->pkt_dts = frame->pts;
-				frame->pkt_pts = frame->pts;
+				//frame->pts = av_gettime_relative();// -_start_time;
+				//frame->pkt_dts = frame->pts;
+				//frame->pkt_pts = frame->pts;
 				on_data_(frame);
 			}
 
