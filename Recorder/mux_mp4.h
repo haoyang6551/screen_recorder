@@ -23,8 +23,7 @@ namespace am {
 		int Init(
 			const char* output_file,
 			RecordDesktop* source_desktop,
-			RecordAudio** source_audios,
-			const int source_audios_nb,
+			RecordAudio* source_audio,
 			const MuxSetting& setting
 		);
 
@@ -63,7 +62,7 @@ namespace am {
 
 		int add_video_stream(const MuxSetting& setting, RecordDesktop* source_desktop);
 
-		int add_audio_stream(const MuxSetting& setting, RecordAudio** source_audios, const int source_audios_nb);
+		int add_audio_stream(const MuxSetting& setting, RecordAudio* source_audio);
 
 		int open_output(const char* output_file, const MuxSetting& setting);
 

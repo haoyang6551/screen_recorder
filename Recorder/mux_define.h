@@ -15,7 +15,6 @@ namespace am {
 	class SwsVideo;
 
 	class EncoderAAC;
-	class FilterAudio;
 	class RecordAudio;
 	class ResampleAudio;
 
@@ -48,12 +47,10 @@ namespace am {
 
 		//audio
 		EncoderAAC* a_enc_;          // audio encoder
-		FilterAudio* a_filter_;      // audio mixer
-		int a_nb_;                    // audio source num
-		RecordAudio** a_src_;        // audio sources
-		ResampleAudio** a_rs_;         // audio resamplers
-		AudioSample** a_samples_;     // audio sample data
-		AudioSample** a_resamples_;   // audio resampled data
+		RecordAudio* a_src_;        // audio sources
+		ResampleAudio* a_rs_;         // audio resamplers
+		AudioSample* a_samples_;     // audio sample data
+		AudioSample* a_resamples_;   // audio resampled data
 	};
 }
 

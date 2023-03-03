@@ -24,7 +24,7 @@ static am::RecordDesktop* recorder_desktop = nullptr;
 
 static am::MuxMP4* muxer;
 
-static am::RecordAudio* audios[2];
+static am::RecordAudio* audio;
 
 int start_muxer() {
 	std::string input_id, input_name, out_id, out_name;
@@ -36,10 +36,6 @@ int start_muxer() {
 		false
 	);
 
-	record_audio_new(RecordAudioTypes::AT_AUDIO_DSHOW, &recorder_microphone);
-	recorder_microphone->Init("audio=" + input_name, input_id, true);
-
-
 	record_desktop_new(RecordDesktopTypes::DT_DESKTOP_FFMPEG_GDI, &recorder_desktop);
 
 	RecordDesktopRect rect;
@@ -50,8 +46,7 @@ int start_muxer() {
 
 	recorder_desktop->Init(rect, V_FRAME_RATE);
 
-	audios[0] = recorder_speaker;
-	audios[1] = recorder_microphone;
+	audio = recorder_speaker;
 
 	muxer = new am::MuxMP4();
 
@@ -68,7 +63,7 @@ int start_muxer() {
 	setting.a_sample_rate_ = A_SAMPLE_RATE;
 	setting.a_bit_rate_ = A_BIT_RATE;
 
-	int error = muxer->Init("..\\..\\save.mp4", recorder_desktop, audios, 2, setting);
+	int error = muxer->Init("..\\..\\save.mp4", recorder_desktop, audio, setting);
 	if (error != AE_NO) {
 		return error;
 	}
@@ -103,8 +98,6 @@ void test_recorder()
 	stop_muxer();
 
 }
-
-
 
 
 

@@ -177,7 +177,7 @@ namespace am {
 			}
 
 			if (ret == 0 && on_data_)
-				on_data_(frame, extra_index_);
+				on_data_(frame, 0);
 
 			av_frame_unref(frame);
 		}

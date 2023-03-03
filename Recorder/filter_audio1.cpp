@@ -1,4 +1,4 @@
-#include "filter_audio.h"
+#include "filter_audio1.h"
 
 #include <chrono>
 
@@ -8,7 +8,7 @@ namespace am {
 
 	static void print_frame(const AVFrame* frame, int index)
 	{
-		std::cout << "index:" << index << frame->pts << frame->nb_samples << std::endl;
+		std::cout << "index: " << index << " frame pts: " << frame->pts << frame->nb_samples << std::endl;
 	}
 
 	FilterAudio::FilterAudio()
@@ -203,7 +203,7 @@ namespace am {
 				break;
 			}
 
-			//print_frame(frame, index);
+			// print_frame(frame, index);
 			int ret = av_buffersrc_add_frame_flags(ctx, frame, AV_BUFFERSRC_FLAG_KEEP_REF);
 			if (ret < 0) {
 				error = AE_FILTER_ADD_FRAME_FAILED;

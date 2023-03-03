@@ -20,8 +20,7 @@ namespace am {
 		virtual int Init(
 			const char* output_file,
 			RecordDesktop* source_desktop,
-			RecordAudio** source_audios,
-			const int source_audios_nb,
+			RecordAudio* source_audio,
 			const MuxSetting& setting
 		) = 0;
 

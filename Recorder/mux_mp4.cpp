@@ -8,7 +8,6 @@
 #include "record_audio.h"
 #include "encode_aac.h"
 #include "resample_audio.h"
-#include "filter_audio.h"
 
 #include "ring_buffer.h"
 
@@ -48,8 +47,7 @@ namespace am {
 	int MuxMP4::Init(
 		const char* output_file,
 		RecordDesktop* source_desktop,
-		RecordAudio** source_audios,
-		const int source_audios_nb,
+		RecordAudio* source_audio,
 		const MuxSetting& setting
 	)
 	{
@@ -68,7 +66,7 @@ namespace am {
 			}
 
 			if (fmt_->audio_codec != AV_CODEC_ID_NONE) {
-				error = add_audio_stream(setting, source_audios, source_audios_nb);
+				error = add_audio_stream(setting, source_audio);
 				if (error != AE_NO)
 					break;
 			}
@@ -113,15 +111,8 @@ namespace am {
 		if (a_stream_ && a_stream_->a_enc_)
 			a_stream_->a_enc_->Start();
 
-		if (a_stream_ && a_stream_->a_filter_)
-			a_stream_->a_filter_->Start();
-
-		if (a_stream_ && a_stream_->a_src_) {
-			for (int i = 0; i < a_stream_->a_nb_; i++) {
-				if (a_stream_->a_src_[i])
-					a_stream_->a_src_[i]->Start();
-			}
-		}
+		if (a_stream_ && a_stream_->a_src_) 
+			a_stream_->a_src_->Start();
 
 		if (v_stream_ && v_stream_->v_src_)
 			v_stream_->v_src_->Start();
@@ -143,19 +134,12 @@ namespace am {
 		std::cout << "try to stop muxer...." << std::endl;
 
 		std::cout << "stop audio recorder..." << std::endl;
-		if (a_stream_ && a_stream_->a_src_) {
-			for (int i = 0; i < a_stream_->a_nb_; i++) {
-				a_stream_->a_src_[i]->Stop();
-			}
-		}
+		if (a_stream_ && a_stream_->a_src_) 
+			a_stream_->a_src_->Stop();
 
 		std::cout << "stop video recorder..." << std::endl;
 		if (v_stream_ && v_stream_->v_src_)
 			v_stream_->v_src_->Stop();
-
-		std::cout << "stop audio filter..." << std::endl;
-		if (a_stream_ && a_stream_->a_filter_)
-			a_stream_->a_filter_->Stop();
 
 
 		std::cout << "stop video encoder..." << std::endl;
@@ -203,89 +187,57 @@ namespace am {
 			v_stream_->v_enc_->put(yuv_data, len, frame);
 		}
 	}
-
+	
 	void MuxMP4::on_desktop_error(int error)
 	{
 		std::cout << "on desktop capture error:" << error << std::endl;
 	}
 
-	void MuxMP4::on_audio_data(AVFrame* frame, int index)
+
+	void MuxMP4::on_audio_data(AVFrame* frame, int len)
 	{
 		if (running_ == false
 			|| !a_stream_
 			|| !a_stream_->a_samples_
-			|| !a_stream_->a_samples_[index]
 			|| !a_stream_->a_resamples_
-			|| !a_stream_->a_resamples_[index]
-			|| !a_stream_->a_rs_
-			|| !a_stream_->a_rs_[index])
+			|| !a_stream_->a_rs_)
 			return;
 
-		a_stream_->a_filter_->add_frame(frame, index);
+		AudioSample* samples = a_stream_->a_samples_;
+		AudioSample* resamples = a_stream_->a_resamples_;
+		ResampleAudio* resampler = a_stream_->a_rs_;
 
-		return;
+		int copied_len = 0;
+		int sample_len = av_samples_get_buffer_size(NULL, frame->channels, frame->nb_samples, (AVSampleFormat)frame->format, 1);
+		int remain_len = sample_len;
+
+		while (remain_len > 0) {
+			//cache pcm
+			copied_len = min(samples->size_ - samples->sample_in_, remain_len);
+			if (copied_len) {
+				memcpy(samples->buff_ + samples->sample_in_, frame->data[0] + sample_len - remain_len, copied_len);
+				samples->sample_in_ += copied_len;
+				remain_len = remain_len - copied_len;
+			}
+
+			//got enough pcm to encoder,resample and mix
+			if (samples->sample_in_ == samples->size_) {
+				int ret = resampler->Convert(samples->buff_, samples->size_, resamples->buff_, resamples->size_);
+				if (ret > 0) {
+					a_stream_->a_enc_->put(resamples->buff_, resamples->size_, frame);
+				}
+				else {
+					std::cout << "resample audio %d failed " << ret << std::endl;
+				}
+
+				samples->sample_in_ = 0;
+			}
+		}
 	}
 
 	void MuxMP4::on_audio_error(int error, int index)
 	{
 		std::cout << "on audio capture error:%d with stream index:" << error << index << std::endl;
-	}
-
-	void MuxMP4::on_filter_audio_data(AVFrame* frame)
-	{
-		if (running_ == false || !a_stream_->a_enc_)
-			return;
-
-
-		AudioSample* resamples = a_stream_->a_resamples_[0];
-
-		int copied_len = 0;
-		int sample_len = av_samples_get_buffer_size(frame->linesize, frame->channels, frame->nb_samples, (AVSampleFormat)frame->format, 1);
-		sample_len = av_samples_get_buffer_size(NULL, frame->channels, frame->nb_samples, (AVSampleFormat)frame->format, 1);
-
-		int remain_len = sample_len;
-
-		//for data is planar,should copy data[0] data[1] to correct buff pos
-		if (av_sample_fmt_is_planar((AVSampleFormat)frame->format) == 0) {
-			while (remain_len > 0) {
-				//cache pcm
-				copied_len = min(resamples->size_ - resamples->sample_in_, remain_len);
-				if (copied_len) {
-					memcpy(resamples->buff_ + resamples->sample_in_, frame->data[0] + sample_len - remain_len, copied_len);
-					resamples->sample_in_ += copied_len;
-					remain_len = remain_len - copied_len;
-				}
-
-				//got enough pcm to encoder,resample and mix
-				if (resamples->sample_in_ == resamples->size_) {
-					a_stream_->a_enc_->put(resamples->buff_, resamples->size_, frame);
-
-					resamples->sample_in_ = 0;
-				}
-			}
-		}
-		else {//resample size is channels*frame->linesize[0],for 2 channels
-			while (remain_len > 0) {
-				copied_len = min(resamples->size_ - resamples->sample_in_, remain_len);
-				if (copied_len) {
-					memcpy(resamples->buff_ + resamples->sample_in_ / 2, frame->data[0] + (sample_len - remain_len) / 2, copied_len / 2);
-					memcpy(resamples->buff_ + resamples->size_ / 2 + resamples->sample_in_ / 2, frame->data[1] + (sample_len - remain_len) / 2, copied_len / 2);
-					resamples->sample_in_ += copied_len;
-					remain_len = remain_len - copied_len;
-				}
-
-				if (resamples->sample_in_ == resamples->size_) {
-					a_stream_->a_enc_->put(resamples->buff_, resamples->size_, frame);
-
-					resamples->sample_in_ = 0;
-				}
-			}
-		}
-	}
-
-	void MuxMP4::on_filter_audio_error(int error)
-	{
-		std::cout << "on filter audio error:" << error << std::endl;
 	}
 
 	void MuxMP4::on_enc_264_data(AVPacket* packet)
@@ -417,7 +369,7 @@ namespace am {
 		return error;
 	}
 
-	int MuxMP4::add_audio_stream(const MuxSetting& setting, RecordAudio** source_audios, const int source_audios_nb)
+	int MuxMP4::add_audio_stream(const MuxSetting& setting, RecordAudio* source_audio)
 	{
 		int error = AE_NO;
 		int ret = 0;
@@ -425,11 +377,10 @@ namespace am {
 		a_stream_ = new MuxStream();
 		memset(a_stream_, 0, sizeof(MuxStream));
 
-		a_stream_->a_nb_ = source_audios_nb;
-		a_stream_->a_rs_ = new ResampleAudio * [a_stream_->a_nb_];
-		a_stream_->a_resamples_ = new AudioSample * [a_stream_->a_nb_];
-		a_stream_->a_samples_ = new AudioSample * [a_stream_->a_nb_];
-		a_stream_->a_src_ = new RecordAudio * [a_stream_->a_nb_];
+		a_stream_->a_rs_ = new ResampleAudio();
+		a_stream_->a_resamples_ = new AudioSample();
+		a_stream_->a_samples_ = new AudioSample();
+		a_stream_->a_src_ = source_audio;
 		a_stream_->pre_pts_ = -1;
 
 
@@ -449,76 +400,35 @@ namespace am {
 				std::bind(&MuxMP4::on_enc_aac_error, this, std::placeholders::_1)
 			);
 
-			for (int i = 0; i < a_stream_->a_nb_; i++) {
+			a_stream_->a_src_->registe_cb(
+				std::bind(&MuxMP4::on_audio_data, this, std::placeholders::_1, std::placeholders::_2),
+				std::bind(&MuxMP4::on_audio_error, this, std::placeholders::_1, std::placeholders::_2)
+			);
 
-				a_stream_->a_src_[i] = source_audios[i];
-				a_stream_->a_src_[i]->registe_cb(
-					std::bind(&MuxMP4::on_audio_data, this, std::placeholders::_1, std::placeholders::_2),
-					std::bind(&MuxMP4::on_audio_error, this, std::placeholders::_1, std::placeholders::_2),
-					i
-				);
-
-				SAMPLE_SETTING src_setting = {
-					a_stream_->a_enc_->get_nb_samples(),
-					av_get_default_channel_layout(a_stream_->a_src_[i]->get_channel_num()),
-					a_stream_->a_src_[i]->get_channel_num(),
-					a_stream_->a_src_[i]->get_fmt(),
-					a_stream_->a_src_[i]->get_sample_rate()
-				};
-				SAMPLE_SETTING dst_setting = {
-					a_stream_->a_enc_->get_nb_samples(),
-					av_get_default_channel_layout(setting.a_nb_channel_),
-					setting.a_nb_channel_,
-					setting.a_sample_fmt_,
-					setting.a_sample_rate_
-				};
-
-				a_stream_->a_rs_[i] = new ResampleAudio();
-				a_stream_->a_resamples_[i] = new AudioSample({ NULL,0,0 });
-				a_stream_->a_rs_[i]->Init(&src_setting, &dst_setting, &a_stream_->a_resamples_[i]->size_);
-				a_stream_->a_resamples_[i]->buff_ = new uint8_t[a_stream_->a_resamples_[i]->size_];
-
-				a_stream_->a_samples_[i] = new AudioSample({ NULL,0,0 });
-				a_stream_->a_samples_[i]->size_ = av_samples_get_buffer_size(NULL, src_setting.nb_channels, src_setting.nb_samples, src_setting.fmt, 1);
-				a_stream_->a_samples_[i]->buff_ = new uint8_t[a_stream_->a_samples_[i]->size_];
-			}
-
-			a_stream_->a_filter_ = new am::FilterAudio();
-			error = a_stream_->a_filter_->Init(
-				{
-					NULL,NULL,
-					a_stream_->a_src_[0]->get_time_base(),
-					a_stream_->a_src_[0]->get_sample_rate(),
-					a_stream_->a_src_[0]->get_fmt(),
-					a_stream_->a_src_[0]->get_channel_num(),
-					av_get_default_channel_layout(a_stream_->a_src_[0]->get_channel_num())
-				},
-			{
-				NULL,NULL,
-				a_stream_->a_src_[1]->get_time_base(),
-				a_stream_->a_src_[1]->get_sample_rate(),
-				a_stream_->a_src_[1]->get_fmt(),
-				a_stream_->a_src_[1]->get_channel_num(),
-				av_get_default_channel_layout(a_stream_->a_src_[1]->get_channel_num())
-			},
-			{
-				NULL,NULL,
-				{ 1,AV_TIME_BASE },
-				setting.a_sample_rate_,
-				setting.a_sample_fmt_,
+			SAMPLE_SETTING src_setting = {
+				a_stream_->a_enc_->get_nb_samples(),
+				av_get_default_channel_layout(a_stream_->a_src_->get_channel_num()),
+				a_stream_->a_src_->get_channel_num(),
+				a_stream_->a_src_->get_fmt(),
+				a_stream_->a_src_->get_sample_rate()
+			};
+			SAMPLE_SETTING dst_setting = {
+				a_stream_->a_enc_->get_nb_samples(),
+				av_get_default_channel_layout(setting.a_nb_channel_),
 				setting.a_nb_channel_,
-				av_get_default_channel_layout(setting.a_nb_channel_)
-			}
-			);
+				setting.a_sample_fmt_,
+				setting.a_sample_rate_
+			};
 
-			if (error != AE_NO) {
-				break;
-			}
+			a_stream_->a_rs_ = new ResampleAudio();
+			a_stream_->a_resamples_ = new AudioSample({ NULL,0,0 });
+			a_stream_->a_rs_->Init(&src_setting, &dst_setting, &a_stream_->a_resamples_->size_);
+			a_stream_->a_resamples_->buff_ = new uint8_t[a_stream_->a_resamples_->size_];
 
-			a_stream_->a_filter_->registe_cb(
-				std::bind(&MuxMP4::on_filter_audio_data, this, std::placeholders::_1),
-				std::bind(&MuxMP4::on_filter_audio_error, this, std::placeholders::_1)
-			);
+			a_stream_->a_samples_ = new AudioSample({ NULL,0,0 });
+			a_stream_->a_samples_->size_ = av_samples_get_buffer_size(NULL, src_setting.nb_channels, src_setting.nb_samples, src_setting.fmt, 1);
+			a_stream_->a_samples_->buff_ = new uint8_t[a_stream_->a_samples_->size_];
+			
 
 			AVCodec* codec = avcodec_find_encoder(fmt_->audio_codec);
 			if (!codec) {
@@ -613,34 +523,28 @@ namespace am {
 		if (a_stream_->a_enc_)
 			delete a_stream_->a_enc_;
 
-		if (a_stream_->a_filter_)
-			delete a_stream_->a_filter_;
+		if (a_stream_->a_rs_)
+			delete a_stream_->a_rs_;
 
-		if (a_stream_->a_nb_) {
-			for (int i = 0; i < a_stream_->a_nb_; i++) {
-				if (a_stream_->a_rs_ && a_stream_->a_rs_[i])
-					delete a_stream_->a_rs_[i];
-
-				if (a_stream_->a_samples_ && a_stream_->a_samples_[i]) {
-					delete[] a_stream_->a_samples_[i]->buff_;
-					delete a_stream_->a_samples_[i];
-				}
-
-				if (a_stream_->a_resamples_ && a_stream_->a_resamples_[i]) {
-					delete[] a_stream_->a_resamples_[i]->buff_;
-					delete a_stream_->a_resamples_[i];
-				}
-			}
-
-			if (a_stream_->a_rs_)
-				delete[] a_stream_->a_rs_;
-
-			if (a_stream_->a_samples_)
-				delete[] a_stream_->a_samples_;
-
-			if (a_stream_->a_resamples_)
-				delete[] a_stream_->a_resamples_;
+		if (a_stream_->a_samples_) {
+			delete[] a_stream_->a_samples_->buff_;
+			delete a_stream_->a_samples_;
 		}
+
+		if (a_stream_->a_resamples_) {
+			delete[] a_stream_->a_resamples_->buff_;
+			delete a_stream_->a_resamples_;
+		}
+
+		if (a_stream_->a_rs_)
+			delete[] a_stream_->a_rs_;
+
+		if (a_stream_->a_samples_)
+			delete[] a_stream_->a_samples_;
+
+		if (a_stream_->a_resamples_)
+			delete[] a_stream_->a_resamples_;
+		
 
 		delete a_stream_;
 
@@ -730,7 +634,6 @@ namespace am {
 		}
 
 		packet->pts = packet->pts - a_stream_->pre_pts_;
-		packet->pts = av_rescale_q(packet->pts, a_stream_->a_filter_->get_time_base(), { 1,AV_TIME_BASE });
 		packet->pts = av_rescale_q_rnd(packet->pts, { 1,AV_TIME_BASE }, a_stream_->st_->time_base, (AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
 
 		packet->dts = packet->pts;//make sure that dts is equal to pts

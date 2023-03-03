@@ -52,11 +52,9 @@ namespace am {
 
 		inline void registe_cb(
 			AudioDataFunc on_data,
-			AudioErrorFunc on_error,
-			int extra_index = -1) {
+			AudioErrorFunc on_error) {
 			on_data_ = on_data;
 			on_error_ = on_error;
-			extra_index_ = extra_index;
 		}
 
 	protected:

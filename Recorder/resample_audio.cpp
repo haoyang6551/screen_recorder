@@ -64,6 +64,7 @@ namespace am {
 
 		return swr_convert(ctx_, out, sample_dst_->nb_samples, in1, sample_src_->nb_samples);
 	}
+
 	void ResampleAudio::CleanUp()
 	{
 		if (sample_src_)
